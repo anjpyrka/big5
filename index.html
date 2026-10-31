@@ -42,7 +42,7 @@ footer{font-size:.85rem;color:var(--muted)}
 <header style="display:grid;gap:12px">
 <p class="eyebrow">Leading Mindfully · Kurztest</p>
 <h1>Big-Five-Kurztest</h1>
-<p>20 Aussagen, etwa fünf Minuten. Antworte spontan, wie du meistens bist, nicht wie du gern wärst. Deine Antworten bleiben auf deinem Gerät, nichts wird gespeichert oder übertragen.</p>
+<p>20 Aussagen, etwa fünf Minuten. Antworte spontan, wie du meistens bist, nicht wie du gern wärst. Deine Antworten bleiben auf deinem Gerät.<span id="raumHint" hidden> Am Ende kannst du deine fünf Werte anonym in den Raum schicken, wenn du magst.</span></p>
 </header>
 <form id="f"><ol id="items"></ol></form>
 <button id="go" disabled>Auswertung anzeigen</button>
@@ -60,6 +60,9 @@ C:["Gewissenhaftigkeit","Ordnung, Planung, Verlässlichkeit. Spricht an: ein kla
 E:["Extraversion","Energie aus Kontakt, gesprächig, gern sichtbar. Spricht an: Austausch, Tempo, gemeinsames Denken."],
 A:["Verträglichkeit","Mitgefühl, Kooperation, Harmonie. Spricht an: Wertschätzung, Rücksicht, das Wir."],
 S:["Emotionale Stabilität","Gelassen, schwer aus der Ruhe zu bringen. Niedrige Werte heißen: Druck wird stärker gespürt, Sicherheit hilft."]};
+const RAUM=(new URLSearchParams(location.search).get('raum')||'').replace(/[^a-z0-9-]/gi,'').slice(0,64);
+const DEV=Math.random().toString(36).slice(2,10);
+if(RAUM)document.getElementById('raumHint').hidden=false;
 const ol=document.getElementById('items');
 I.forEach((it,i)=>{const li=document.createElement('li');li.innerHTML=`<p class="q">${i+1}. ${it[0]}</p><div class="opts" role="radiogroup" aria-label="Aussage ${i+1}">${L.map((l,v)=>`<input type="radio" name="q${i}" id="q${i}v${v}" value="${v+1}"><label for="q${i}v${v}"><b>${v+1}</b>${l}</label>`).join('')}</div>`;ol.appendChild(li)});
 const f=document.getElementById('f'),go=document.getElementById('go'),res=document.getElementById('res');
@@ -70,7 +73,14 @@ const m=k=>s[k].reduce((a,b)=>a+b,0)/4;const sc={O:m('O'),C:m('C'),E:m('E'),A:m(
 const order=Object.keys(sc).sort((a,b)=>sc[b]-sc[a]);
 res.hidden=false;res.innerHTML=`<h2>Dein Profil</h2><div class="top"><p class="eyebrow">Deine stärkste Dimension</p><h2>${D[order[0]][0]}</h2><p>${D[order[0]][1]}</p></div>`+
 order.map(k=>`<div class="bar"><div class="row"><b>${D[k][0]}</b><span class="muted">${sc[k].toFixed(1).replace('.',',')} von 5</span></div><div class="track"><span style="width:${(sc[k]-1)/4*100}%"></span></div><p class="muted" style="font-size:.92rem">${D[k][1]}</p></div>`).join('')+
-`<p class="muted">Grobe Orientierung: über 3,5 eher ausgeprägt, unter 2,5 eher schwach. Kein Wert ist besser als ein anderer.</p>`;res.scrollIntoView({behavior:'smooth'})});
+`<p class="muted">Grobe Orientierung: über 3,5 eher ausgeprägt, unter 2,5 eher schwach. Kein Wert ist besser als ein anderer.</p>`+
+(RAUM?`<div class="top" style="display:grid;gap:12px"><p class="eyebrow">Für den Workshop</p><h2 style="font-size:1.25rem">Deine Blüte im Raum zeigen</h2><p class="muted" style="font-size:.95rem">Schickt nur deine fünf Werte, ohne Namen, an die Raum-Ansicht auf der Leinwand. Nach etwa 12 Stunden werden sie automatisch gelöscht.</p><button id="send" type="button" style="justify-self:start">In den Raum schicken</button><p id="sendMsg" class="muted" role="status" style="font-size:.95rem"></p></div>`:'');
+if(RAUM){const btn=document.getElementById('send'),msg=document.getElementById('sendMsg');
+btn.onclick=async()=>{btn.disabled=true;msg.textContent='Wird gesendet …';
+try{const r=await fetch('https://ntfy.sh/'+encodeURIComponent(RAUM),{method:'POST',body:JSON.stringify({v:['O','C','E','A','S'].map(k=>sc[k]),id:DEV})});
+if(!r.ok)throw new Error(r.status);btn.textContent='Gesendet';msg.textContent='Danke. Deine Blüte erscheint gleich auf der Leinwand.';}
+catch(e){btn.disabled=false;msg.textContent='Das hat nicht geklappt. Bitte noch einmal tippen.';}};}
+res.scrollIntoView({behavior:'smooth'})});
 </script>
 </body>
 </html>
