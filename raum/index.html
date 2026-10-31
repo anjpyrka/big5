@@ -89,10 +89,10 @@ function drawFlower(svg,s,R,col,hi,lab){
   s.forEach((v,k)=>{const p=(v-1)/4;const L=R*(.28+.72*p);
     svg.appendChild(el('path',{d:petal(L,L*.36),transform:`rotate(${k*72})`,fill:col,'fill-opacity':(hi?.3:.1)+.4*p,stroke:col,'stroke-opacity':.9,'stroke-width':1.6,'stroke-linejoin':'round'}));});
   svg.appendChild(el('circle',{r:R*.08,fill:col}));
-  if(lab)s.forEach((v,k)=>{const p=(v-1)/4;const L=R*(.28+.72*p);const r=Math.min(L+lab*.75,R+lab*.2);const a=k*72*Math.PI/180;
-    const t=el('text',{x:(r*Math.sin(a)).toFixed(1),y:(-r*Math.cos(a)).toFixed(1),'text-anchor':'middle','dominant-baseline':'central','font-size':lab,'font-weight':700,fill:col,'fill-opacity':.95,'font-family':'Figtree, Arial, sans-serif'});t.textContent=IN[k];svg.appendChild(t);});
+  if(lab)s.forEach((v,k)=>{const p=(v-1)/4;const L=R*(.28+.72*p);const r=R+lab*.8;const a=k*72*Math.PI/180;
+    const t=el('text',{x:(r*Math.sin(a)).toFixed(1),y:(-r*Math.cos(a)).toFixed(1),'text-anchor':'middle','dominant-baseline':'central','font-size':lab,'font-weight':700,fill:col,'fill-opacity':.8,'font-family':'Figtree, Arial, sans-serif'});t.textContent=IN[k];svg.appendChild(t);});
 }
-(function(){const k=document.getElementById('keyFlower');drawFlower(k,[5,5,5,5,5],30,'#9A938C',false,12);})();
+(function(){const k=document.getElementById('keyFlower');drawFlower(k,[5,5,5,5,5],28,'#9A938C',false,12);})();
 
 function renderMeadow(){
   const m=document.getElementById('meadow');m.innerHTML='';
@@ -101,7 +101,7 @@ function renderMeadow(){
     const b=document.createElement('button');b.type='button';b.className='fl';b.setAttribute('aria-pressed',i===selected);
     b.setAttribute('aria-label',`Person ${i+1}: `+TR.map((t,k)=>`${t} ${fmt(s[k])}`).join(', '));
     const svg=el('svg',{viewBox:'-75 -75 150 150'});const g=el('g',{class:'grow',style:`animation-delay:${Math.min(i,20)*60}ms;transform-origin:0 0`});
-    drawFlower(g,s,60,i===selected?'#E3E31F':'#E9E6E2',i===selected,17);svg.appendChild(g);b.appendChild(svg);
+    drawFlower(g,s,54,i===selected?'#E3E31F':'#E9E6E2',i===selected,16);svg.appendChild(g);b.appendChild(svg);
     const sm=document.createElement('small');sm.textContent=String(i+1);b.appendChild(sm);
     b.onclick=()=>{selected=selected===i?-1:i;renderAll()};m.appendChild(b);
   });
